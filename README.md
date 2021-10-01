@@ -203,3 +203,34 @@ fn main() {
         };
 }
 ```
+
+### If let example
+
+We want to do something with the `Some(3)` match but do nothing with any other `Some<u8>` value or the None value. To satisfy the match expression, we have to add _ => () after processing just one variant, which is a lot of boilerplate code to add.
+
+Instead, we could write this in a shorter way using if let.
+
+```rust
+fn main() {
+        enum IpAddr {
+            V4(u8, u8, u8, u8),
+            V6(String),
+        }
+
+        let home = IpAddr::V4(127, 0, 0, 1);
+        let loopback = IpAddr::V6(String::from("::1"));
+
+        let loopback = match home { // Add this line
+                IpAddr::V4(127, b, c, d) => Some(home),
+                _ => None
+        };
+
+        if let Some(addr) = loopback {
+            println!("Found loopback addr");
+        } else {
+            println!("No address found");
+        }
+}
+
+```
+
