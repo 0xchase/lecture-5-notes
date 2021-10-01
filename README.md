@@ -101,3 +101,105 @@ To learn more, run the command again with --verbose.
 
 In order to add these values you have to convert an `Option<T>` to a T. Generally, this helps catch one of the most common issues with null: assuming that something isn’t null when it actually is.
 
+### Pattern example
+
+*Open pattern.rs*
+
+This example shows a basic match with the ipaddr enum we created previously. We can also match with specific values in the pattern match.
+
+```rust
+fn main() {
+        enum IpAddr {
+            V4(u8, u8, u8, u8),
+            V6(String),
+        }
+
+        let home = IpAddr::V4(127, 0, 0, 1);
+        let loopback = IpAddr::V6(String::from("::1"));
+
+        match home {
+                IpAddr::V4(a, b, c, d) => println!("Is V4"),
+                IpAddr::V4(127, b, c, d) => println!("Is V4 loopback"), // Add this line
+                IpAddr::V6(a) => println!("Is V6")
+        };
+}
+```
+
+Rust will require that our matches be *exaustive*. 
+
+```rust
+fn main() {
+        enum IpAddr {
+            V4(u8, u8, u8, u8),
+            V6(String),
+        }
+
+        let home = IpAddr::V4(127, 0, 0, 1);
+        let loopback = IpAddr::V6(String::from("::1"));
+
+        match home {
+                IpAddr::V4(a, b, c, d) => println!("Is V4"),
+                IpAddr::V4(127, b, c, d) => println!("Is V4 loopback"),
+                // Remove this line
+        };
+}
+```
+
+For example, if we don't attempt to match with the V6 variant, the compiler will throw an error. 
+
+```rust
+error[E0004]: non-exhaustive patterns: `V6(_)` not covered
+  --> temp.rs:10:8
+   |
+2  | /     enum IpAddr {
+3  | |         V4(u8, u8, u8, u8),
+4  | |         V6(String),
+   | |         -- not covered
+5  | |     }
+   | |_____- `main::IpAddr` defined here
+...
+10 |       match home {
+   |             ^^^^ pattern `V6(_)` not covered
+   |
+   = help: ensure that all possible cases are being handled, possibly by adding wildcards or more match arms
+   = note: the matched value is of type `main::IpAddr`
+```
+
+We don't have to match every pattern explicitly, however. We can use _ to catch all remaining cases. 
+
+```rust
+fn main() {
+        enum IpAddr {
+            V4(u8, u8, u8, u8),
+            V6(String),
+        }
+
+        let home = IpAddr::V4(127, 0, 0, 1);
+        let loopback = IpAddr::V6(String::from("::1"));
+
+        match home {
+                IpAddr::V4(a, b, c, d) => println!("Is V4"),
+                IpAddr::V4(127, b, c, d) => println!("Is V4 loopback"),
+                _ => println!("Is V6") // Convert this line
+        };
+}
+```
+
+Pattern matches can also be used to set variables as shown below. 
+
+```rust
+fn main() {
+        enum IpAddr {
+            V4(u8, u8, u8, u8),
+            V6(String),
+        }
+
+        let home = IpAddr::V4(127, 0, 0, 1);
+        let loopback = IpAddr::V6(String::from("::1"));
+
+        let loopback = match home { // Add this line
+                IpAddr::V4(127, b, c, d) => Some(home),
+                _ => None
+        };
+}
+```
