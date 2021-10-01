@@ -358,31 +358,11 @@ fn main() {
 ### Propagation example
 
 
-A naive way to accompolish this is shown below.
+A naive way to accompolish this is shown here.
 
-```rust
-use std::fs::File;
-use std::io;
-use std::io::Read;
+*Open propagation.rs*
 
-fn read_username_from_file() -> Result<String, io::Error> {
-    let f = File::open("hello.txt");
-
-    let mut f = match f {
-        Ok(file) => file,
-        Err(e) => return Err(e),
-    };
-
-    let mut s = String::new();
-
-    match f.read_to_string(&mut s) {
-        Ok(_) => Ok(s),
-        Err(e) => Err(e),
-    }
-}
-```
-
-Using the match expressions here is quite verbose. To make this more concise, we can use the `?` operator, which makes the above example much more concise.
+Using the match expressions here is quite verbose. To make this more concise, we can use the `?` operator, which makes the above example much more concise. The question mark operator will unpack the result if it's ok, and or return the error if there's an error. 
 
 ```rust
 use std::fs::File;
@@ -399,3 +379,69 @@ fn read_username_from_file() -> Result<String, io::Error> {
 ```
 
 This operator should only be used on functions that return a result. If we attempt to use this in the main function, for example, the compiler will throw an error. 
+
+This doesn't only work with result, it can also work with the option type. 
+
+### Collections example
+
+```rust
+let mut v1 = Vec::new();
+let mut v2 = vec![1, 2, 3];
+```
+
+Elements can be acccessed using `[]`, or with the `.get()` method. 
+
+```rust
+fn main() {
+
+    let num = vec![10, 20];
+    
+    for x in num.iter() {
+        println!("{}", x);
+    }
+    
+    println!("num[0]: {}", num[0]);
+    println!("num[1]: {}", num[1]);
+    println!("num[2]: {}", num.get(0).unwrap());
+    println!("num[3]: {}", num.get(1).unwrap());
+}
+```
+
+So what's the difference between using `[]` and using `.get()`? The difference is that `.get()` returns an `Option`, as introduced earlier. 
+
+```rust
+fn main() {
+
+    let num = vec![10, 20];
+
+    println!("num[0]: {}", num[0]);
+    println!("num[1]: {}", num[1]);
+    println!("num[2]: {}", num.get(0).unwrap());
+    println!("num[3]: {}", num.get(1).unwrap());
+    
+    if let Some(num) = num.get(2) {
+        println!("Found a value at index");
+    } else {
+        println!("Found no value at index");
+    }
+}
+```
+
+In this example, `num.get(2)` will return `None`. 
+
+If we access the element using `[]`, however, our program will panic.
+
+```rust
+fn main() {
+
+    let num = vec![10, 20];
+
+    println!("num[0]: {}", num[0]);
+    println!("num[1]: {}", num[1]);
+    println!("num[2]: {}", num.get(0).unwrap());
+    println!("num[3]: {}", num.get(1).unwrap());
+    
+    let temp = num[2];
+}
+```
+
